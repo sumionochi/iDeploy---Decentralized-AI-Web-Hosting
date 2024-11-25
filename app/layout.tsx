@@ -26,7 +26,7 @@ export default function RootLayout({
         appearance: {
           theme: 'dark',
           accentColor: '#676FFF',
-          logo: 'https://your-logo-url',
+          logo: 'https://i.pinimg.com/736x/86/fc/47/86fc47284e17d44960218afae1c2a852.jpg',
         },
         // Create embedded wallets for users who don't have a wallet
         embeddedWallets: {
