@@ -30,7 +30,7 @@ yarn-error.log*
 .env
 # vercel
 .vercel
-
+drizzle.config.js
 # typescript
 *.tsbuildinfo
 next-env.d.ts
