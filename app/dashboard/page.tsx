@@ -47,7 +47,7 @@ import {
   getWebpageContent,
 } from "@/utils/db/actions";
 import { usePrivy } from "@privy-io/react-auth";
-import CICDManager from "@/components/CICDManager";
+import Cicd from "@/components/cicd";
 import { email } from "@web3-storage/w3up-client/types";
 import { useRouter } from "next/navigation";
 import { AIWebsiteGenerator } from "@/components/AIWebsiteGenerator";
