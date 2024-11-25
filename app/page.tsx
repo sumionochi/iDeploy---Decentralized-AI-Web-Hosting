@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import TryDeployment from "@/components/TryDeployment";
 import { useTheme } from "next-themes";
+import Navbar from "@/components/NavBar";
 
 export default function Home() {
   const features = [
@@ -51,34 +52,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/10">
       <header className="container mx-auto px-4 py-8">
-      <nav className="flex flex-wrap justify-between items-center mb-16 gap-4">
-          <Link href="/" className="flex items-center space-x-2">
-            <Globe className="w-8 h-8 text-primary" />
-            <span className="text-2xl font-bold">iDeploy</span>
-          </Link>
-          <div className="flex flex-wrap justify-center items-center gap-3">
-            <Link href="/about">
-              <Button variant="ghost" className="text-sm">About</Button>
-            </Link>
-            <Link href="/pricing">
-              <Button variant="ghost" className="text-sm">Pricing</Button>
-            </Link>
-            <Link href="/contact">
-              <Button variant="ghost" className="text-sm">Contact</Button>
-            </Link>
-            <Link href="/login">
-              <Button variant="outline" className="text-sm">Login</Button>
-            </Link>
-            <button onClick={toggleTheme} className="flex items-center gap-2">
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5 text-yellow-500" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </button>
-          </div>
-        </nav>
-
+        
         <div className="text-center max-w-3xl mx-auto">
           <Badge variant="outline" className="mb-4 text-sm px-3 py-1">
             Revolutionizing Web3 Presence
@@ -92,11 +66,11 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-center gap-4">
             <Link href="/dashboard">
               <Button size="lg" className="px-4 w-full sm:w-auto">
-                Launch Your Legacy <ArrowRight className="ml-2" />
+                Deploy at no cost <ArrowRight className="ml-2" />
               </Button>
             </Link>
             <Button size="lg" variant="outline" className="w-full sm:w-auto">
-              Discover the Magic
+              Discover How it Works
             </Button>
           </div>
         </div>

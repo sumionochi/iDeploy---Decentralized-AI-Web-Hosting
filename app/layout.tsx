@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
+"use client"
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import { Toast, ToastProvider } from "@/components/ui/toast";
+import {PrivyProvider} from '@privy-io/react-auth';
+import Navbar from "@/components/NavBar";
 
 const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "iDeploy",
-  description: "Decentralized AI-powered web hosting platform that leverages AI to quickly generates an editable website through image, low fidelity wireframe and text input while blockchain technology provided permanent, censorship-resistant website hosting.",
-};
 
 export default function RootLayout({
   children,
@@ -21,17 +19,35 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <head />
         <body>
-          <ToastProvider>
+        <PrivyProvider
+      appId="cm3x5dtpq06z6nmoffneytgg9"
+      config={{
+        // Customize Privy's appearance in your app
+        appearance: {
+          theme: 'dark',
+          accentColor: '#676FFF',
+          logo: 'https://your-logo-url',
+        },
+        // Create embedded wallets for users who don't have a wallet
+        embeddedWallets: {
+          createOnLogin: 'users-without-wallets',
+        },
+      }}
+    >
+      <ToastProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
+            <Navbar/>
             {children}
             <Toast/>
           </ThemeProvider>
           </ToastProvider>
+    </PrivyProvider>
+          
         </body>
       </html>
     </>
