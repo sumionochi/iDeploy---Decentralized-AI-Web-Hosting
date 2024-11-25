@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { createOrUpdateUser } from "@/utils/db/actions";
 
 export default function Navbar() {
   const { login, logout, authenticated, user } = usePrivy();
@@ -42,19 +43,18 @@ export default function Navbar() {
 
   const handleUserAuthenticated = async () => {
     if (user && user.wallet?.address) {
-      // Uncomment and implement your user update logic
-      // try {
-      //   await createOrUpdateUser(
-      //     user.wallet.address,
-      //     user.email?.address || ""
-      //   );
-      //   const hasClosedModal = localStorage.getItem("emailConfirmModalClosed");
-      //   if (!hasClosedModal) {
-      //     setShowEmailConfirmModal(true);
-      //   }
-      // } catch (error) {
-      //   console.error("Error updating user information:", error);
-      // }
+      try {
+        await createOrUpdateUser(
+          user.wallet.address,
+          user.email?.address || ""
+        );
+        const hasClosedModal = localStorage.getItem("emailConfirmModalClosed");
+        if (!hasClosedModal) {
+          setShowEmailConfirmModal(true);
+        }
+      } catch (error) {
+        console.error("Error updating user information:", error);
+      }
     }
   };
 
