@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Code, Github, Rocket, Info } from 'lucide-react';
+import { Loader2, Code, Github, Rocket, Info, Minimize, Maximize } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
@@ -774,123 +774,153 @@ const tetrisCode = `
 `;
 
 export default function GameDeployment() {
-    const [code, setCode] = useState(snakeGameCode);
-    const [githubUrl, setGithubUrl] = useState("");
-    const [deployedUrl, setDeployedUrl] = useState("");
-    const [isDeploying, setIsDeploying] = useState(false);
-    const [selectedTemplate, setSelectedTemplate] = useState("snakeGame");
-    const [livePreview, setLivePreview] = useState(code);
-    const [showToast, setShowToast] = useState(false);
-  
-    useEffect(() => {
-      setLivePreview(code);
-    }, [code]);
-  
-    const handleDeploy = async () => {
-      setIsDeploying(true);
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      setDeployedUrl(
-        `https://decentralized-web.eth/${Math.random().toString(36).substring(7)}`
-      );
-      setIsDeploying(false);
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
-    };
-  
-    const handleTemplateChange = (value: string) => {
-      setSelectedTemplate(value);
-      switch (value) {
-        case "blank":
-          setCode("");
-          break;
-        case "snakeGame":
-          setCode(snakeGameCode);
-          break;
-        case "tetris":
-          setCode(tetrisCode);
-          break;
-        case "landing":
-          setCode(landingPageCode);
-          break;
-        case "calculator":
-          setCode(calculatorCode);
-          break;
-        case "flappyBird":
-          setCode(flappyBirdCode);
-          break;
-      }
-    };
-  
-    const getInstructions = () => {
-      switch (selectedTemplate) {
-        case "snakeGame":
-          return "Use arrow keys to control the snake. Eat the red apple to grow!";
-        case "tetris":
-          return "Use arrow keys to move, Q to rotate left, W to rotate right.";
-        case "flappyBird":
-          return "Press SPACE or click to make the bird flap and avoid obstacles.";
-        case "calculator":
-          return "Click the buttons to input numbers and operations. Press '=' to calculate.";
-        case "landing":
-          return "This is a static landing page. Customize the content and styling as needed.";
-        default:
-          return "Select a template or start coding from scratch!";
-      }
-    };
-  
-    const [activeTab, setActiveTab] = React.useState("editor")
+  const [code, setCode] = useState(snakeGameCode);
+  const [githubUrl, setGithubUrl] = useState("");
+  const [deployedUrl, setDeployedUrl] = useState("");
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState("snakeGame");
+  const [livePreview, setLivePreview] = useState(code);
+  const [showToast, setShowToast] = useState(false);
 
-    return (
-        <section className="mb-12 bg-white dark:bg-black p-8 rounded-lg shadow-2xl transition-colors duration-300">
-          <h2 className="text-4xl font-bold mb-8 text-center text-gray-900 dark:text-white transition-colors duration-300">
-              Deploy Your Website on Smart Contracts
-          </h2>
-          <Card className="bg-white dark:bg-black text-gray-900 dark:text-black border border-gray-300 dark:border-black transition-colors duration-300">
-            <CardContent className="p-6">
-              <Tabs defaultValue="editor" className="space-y-4">
-                <TabsList className="grid grid-cols-2 p-1 rounded-lg bg-gray-200 dark:bg-gray-900 shadow-inner">
-                  <TabsTrigger
-                    value="editor"
-                    className="relative"
-                    onClick={() => setActiveTab("editor")}
-                  >
-                    {activeTab === "editor" && (
-                      <motion.div
-                        className="absolute inset-0 bg-white dark:bg-gray-700 rounded-lg shadow-lg"
-                        layoutId="activeTab"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                      />
-                    )}
-                    <span className="relative z-10 flex items-center justify-center space-x-2 font-medium text-gray-900 dark:text-white">
-                      <Code className="w-4 h-4 text-gray-900 dark:text-white" />
-                      <span>Code Forge</span>
-                    </span>
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="github"
-                    className="relative"
-                    onClick={() => setActiveTab("github")}
-                  >
-                    {activeTab === "github" && (
-                      <motion.div
-                        className="absolute inset-0 bg-white dark:bg-gray-700 rounded-lg shadow-lg"
-                        layoutId="activeTab"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                      />
-                    )}
-                    <span className="relative z-10 flex items-center justify-center space-x-2 font-medium text-gray-900 dark:text-white">
-                      <Github className="w-4 h-4 text-gray-900 dark:text-white" />
-                      <span>GitHub Sync</span>
-                    </span>
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="editor" className="space-y-4">
-                  <div className="flex flex-col gap-6">
-                    <div className="flex-1 space-y-2">
-                      <div className="flex justify-between items-center">
-                        <Label htmlFor="live-preview" className="text-lg text-gray-900 dark:text-white">
-                          Live Preview
-                        </Label>
+  const iframeRef = React.useRef<HTMLIFrameElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false); // Track fullscreen state
+
+  useEffect(() => {
+    setLivePreview(code);
+  }, [code]);
+
+  const handleDeploy = async () => {
+    setIsDeploying(true);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    setDeployedUrl(
+      `https://decentralized-web.eth/${Math.random().toString(36).substring(7)}`
+    );
+    setIsDeploying(false);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
+  const handleTemplateChange = (value: string) => {
+    setSelectedTemplate(value);
+    switch (value) {
+      case "blank":
+        setCode("");
+        break;
+      case "snakeGame":
+        setCode(snakeGameCode);
+        break;
+      case "tetris":
+        setCode(tetrisCode);
+        break;
+      case "landing":
+        setCode(landingPageCode);
+        break;
+      case "calculator":
+        setCode(calculatorCode);
+        break;
+      case "flappyBird":
+        setCode(flappyBirdCode);
+        break;
+    }
+  };
+
+  const getInstructions = () => {
+    switch (selectedTemplate) {
+      case "snakeGame":
+        return "Use arrow keys to control the snake. Eat the red apple to grow!";
+      case "tetris":
+        return "Use arrow keys to move, Q to rotate left, W to rotate right.";
+      case "flappyBird":
+        return "Press SPACE or click to make the bird flap and avoid obstacles.";
+      case "calculator":
+        return "Click the buttons to input numbers and operations. Press '=' to calculate.";
+      case "landing":
+        return "This is a static landing page. Customize the content and styling as needed.";
+      default:
+        return "Select a template or start coding from scratch!";
+    }
+  };
+
+  const [activeTab, setActiveTab] = React.useState("editor")
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      if (iframeRef.current) {
+        iframeRef.current.requestFullscreen().then(() => {
+          setIsFullscreen(true);
+        }).catch((err: unknown) => {
+          if (err instanceof Error) {
+            console.error(`Error attempting to enable fullscreen mode: ${err.message}`);
+          } else {
+            console.error(`Unknown error: ${err}`);
+          }
+        });
+      }
+    } else {
+      document.exitFullscreen().then(() => {
+        setIsFullscreen(false);
+      }).catch((err: unknown) => {
+        if (err instanceof Error) {
+          console.error(`Error attempting to exit fullscreen mode: ${err.message}`);
+        } else {
+          console.error(`Unknown error: ${err}`);
+        }
+      });
+    }
+  };
+
+  return (
+      <section className="mb-12 bg-white dark:bg-black p-8 rounded-lg shadow-2xl transition-colors duration-300">
+        <h2 className="text-4xl font-bold mb-8 text-center text-gray-900 dark:text-white transition-colors duration-300">
+            Deploy Your Website on Smart Contracts
+        </h2>
+        <Card className="bg-white dark:bg-black text-gray-900 dark:text-black border border-gray-300 dark:border-black transition-colors duration-300">
+          <CardContent className="p-6">
+            <Tabs defaultValue="editor" className="space-y-4">
+              <TabsList className="grid grid-cols-2 p-1 rounded-lg bg-gray-200 dark:bg-gray-900 shadow-inner">
+                <TabsTrigger
+                  value="editor"
+                  className="relative"
+                  onClick={() => setActiveTab("editor")}
+                >
+                  {activeTab === "editor" && (
+                    <motion.div
+                      className="absolute inset-0 bg-white dark:bg-gray-700 rounded-lg shadow-lg"
+                      layoutId="activeTab"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center justify-center space-x-2 font-medium text-gray-900 dark:text-white">
+                    <Code className="w-4 h-4 text-gray-900 dark:text-white" />
+                    <span>Code Forge</span>
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="github"
+                  className="relative"
+                  onClick={() => setActiveTab("github")}
+                >
+                  {activeTab === "github" && (
+                    <motion.div
+                      className="absolute inset-0 bg-white dark:bg-gray-700 rounded-lg shadow-lg"
+                      layoutId="activeTab"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center justify-center space-x-2 font-medium text-gray-900 dark:text-white">
+                    <Github className="w-4 h-4 text-gray-900 dark:text-white" />
+                    <span>GitHub Sync</span>
+                  </span>
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="editor" className="space-y-4">
+                <div className="flex flex-col gap-6">
+                  <div className="flex-1 space-y-2">
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="live-preview" className="text-lg text-gray-900 dark:text-white">
+                        Live Preview
+                      </Label>
+                      <div className="flex flex-col md:flex-row gap-2">
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button size="sm" className="bg-gray-200 dark:bg-black text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-black">
@@ -905,84 +935,103 @@ export default function GameDeployment() {
                             </DialogHeader>
                           </DialogContent>
                         </Dialog>
-                      </div>
-                      <div className="border-2 border-gray-300 dark:border-black rounded-lg overflow-hidden h-[700px] bg-gray-50 dark:bg-black">
-                        <iframe
-                          id="live-preview"
-                          srcDoc={livePreview}
-                          className="w-full h-full"
-                          title="Live Preview"
-                          allowFullScreen
-                        />
+                        <Button
+                          size="sm"
+                          onClick={toggleFullscreen}
+                          className="bg-gray-200 dark:bg-black text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-black"
+                        >
+                          {isFullscreen ? (
+                            <>
+                              <Maximize className="mr-2 h-4 w-4" />
+                              Fullscreen
+                            </>
+                          ) : (
+                            <>
+                              <Maximize className="mr-2 h-4 w-4" />
+                              Fullscreen
+                            </>
+                          )}
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex-1 space-y-4">
-                      <Label htmlFor="template-select" className="text-lg text-gray-900 dark:text-white">
-                        Choose Your Foundation
-                      </Label>
-                      <Select
-                        onValueChange={handleTemplateChange}
-                        value={selectedTemplate}
-                      >
-                        <SelectTrigger className="bg-gray-200 dark:border dark:border-white dark:bg-black border border-gray-300  text-gray-900 dark:text-white">
-                          <SelectValue placeholder="Select a template" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white dark:bg-black border border-gray-300 dark:border-black text-gray-900 dark:text-white">
-                          <SelectItem value="blank">Blank Canvas</SelectItem>
-                          <SelectItem value="snakeGame">Snake Game</SelectItem>
-                          <SelectItem value="tetris">Tetris</SelectItem>
-                          <SelectItem value="landing">Landing Page</SelectItem>
-                          <SelectItem value="calculator">Calculator</SelectItem>
-                          <SelectItem value="flappyBird">Flappy Bird</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Textarea
-                        id="code-editor"
-                        placeholder="Craft your digital masterpiece here..."
-                        value={code}
-                        onChange={(e) => {
-                          setCode(e.target.value);
-                          setLivePreview(e.target.value);
-                        }}
-                        className="min-h-[400px] dark:border dark:border-white font-mono text-sm bg-gray-100 dark:bg-black text-gray-900 dark:text-white border border-gray-300"
+                    <div className="border-2 border-gray-300 dark:border-black rounded-lg overflow-hidden h-[700px] bg-gray-50 dark:bg-black relative">
+                      <iframe
+                        id="live-preview"
+                        srcDoc={livePreview}
+                        className="w-full h-full"
+                        title="Live Preview"
+                        allowFullScreen
+                        ref={iframeRef} // Attach the ref to the iframe
                       />
-                    </div>         
+                    </div>
                   </div>
-                </TabsContent>
-                <TabsContent value="github" className="space-y-4">
-                  <Input
-                    placeholder="Enter your GitHub repository URL"
-                    value={githubUrl}
-                    onChange={(e) => setGithubUrl(e.target.value)}
-                    className="mb-4 bg-gray-200 dark:bg-black text-gray-900 dark:text-white border border-gray-300 dark:border-white"
-                  />
-                </TabsContent>
-              </Tabs>
-              <div className="mt-6 flex justify-center">
-                <Button
-                  onClick={handleDeploy}
-                  disabled={isDeploying}
-                  size="lg"
-                  className="bg-gray-800 dark:border dark:border-white dark:bg-black hover:bg-gray-700 dark:hover:bg-black text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105"
-                >
-                  {isDeploying ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Immortalizing on the Blockchain...
-                    </>
-                  ) : (
-                    <>
-                      <Rocket className="mr-2 h-5 w-5" />
-                      Deploy on Blockchain
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          {deployedUrl && <Deploying deployedUrl={deployedUrl} />}
-        </section>
-      );
-  }
+                  <div className="flex-1 space-y-4">
+                    <Label htmlFor="template-select" className="text-lg text-gray-900 dark:text-white">
+                      Choose Your Foundation
+                    </Label>
+                    <Select
+                      onValueChange={handleTemplateChange}
+                      value={selectedTemplate}
+                    >
+                      <SelectTrigger className="bg-gray-200 dark:border dark:border-white dark:bg-black border border-gray-300  text-gray-900 dark:text-white">
+                        <SelectValue placeholder="Select a template" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white dark:bg-black border border-gray-300 dark:border-black text-gray-900 dark:text-white">
+                        <SelectItem value="blank">Blank Canvas</SelectItem>
+                        <SelectItem value="snakeGame">Snake Game</SelectItem>
+                        <SelectItem value="tetris">Tetris</SelectItem>
+                        <SelectItem value="landing">Landing Page</SelectItem>
+                        <SelectItem value="calculator">Calculator</SelectItem>
+                        <SelectItem value="flappyBird">Flappy Bird</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Textarea
+                      id="code-editor"
+                      placeholder="Craft your digital masterpiece here..."
+                      value={code}
+                      onChange={(e) => {
+                        setCode(e.target.value);
+                        setLivePreview(e.target.value);
+                      }}
+                      className="min-h-[400px] dark:border dark:border-white font-mono text-sm bg-gray-100 dark:bg-black text-gray-900 dark:text-white border border-gray-300"
+                    />
+                  </div>         
+                </div>
+              </TabsContent>
+              <TabsContent value="github" className="space-y-4">
+                <Input
+                  placeholder="Enter your GitHub repository URL"
+                  value={githubUrl}
+                  onChange={(e) => setGithubUrl(e.target.value)}
+                  className="mb-4 bg-gray-200 dark:bg-black text-gray-900 dark:text-white border border-gray-300 dark:border-white"
+                />
+              </TabsContent>
+            </Tabs>
+            <div className="mt-6 flex justify-center">
+              <Button
+                onClick={handleDeploy}
+                disabled={isDeploying}
+                size="lg"
+                className="bg-gray-800 dark:border dark:border-white dark:bg-black hover:bg-gray-700 dark:hover:bg-black text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105"
+              >
+                {isDeploying ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Immortalizing on the Blockchain...
+                  </>
+                ) : (
+                  <>
+                    <Rocket className="mr-2 h-5 w-5" />
+                    Deploy on Blockchain
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+        {deployedUrl && <Deploying deployedUrl={deployedUrl} />}
+      </section>
+    );
+}
   
   

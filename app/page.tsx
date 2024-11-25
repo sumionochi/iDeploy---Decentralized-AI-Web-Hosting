@@ -146,7 +146,7 @@ export default function Home() {
         <TryDeployment/>
       </main>
 
-      <footer className="bg-muted mt-0 mb-8 py-0">
+      <footer className="bg-muted mt-0 pb-8 py-0">
       <div className="mt-0 pt-8 border-t border-muted-foreground/20 text-center text-sm text-muted-foreground">
             <p>&copy; 2024 iDeploy. All rights reserved.</p>
           </div>
