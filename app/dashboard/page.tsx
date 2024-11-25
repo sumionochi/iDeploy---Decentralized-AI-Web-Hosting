@@ -53,7 +53,6 @@ import { useRouter } from "next/navigation";
 import { AIWebsiteGenerator } from "@/components/AIWebsiteGenerator";
 import { DecentralizedCDN } from "@/components/DecentralizedCDN";
 import { Sidebar } from "@/components/ui/sidebar";
-import { SearchEngine } from "@/components/SearchEngine";
 import { ExampleWebsites } from "@/components/ExampleWebsites";
 import SmartContractDeployer from "@/components/SmartContractDeployer";
 // Add this type definition
